@@ -5,7 +5,7 @@
 
 ### Add following properties to application.properties file
 
-azure.key-vault.clientId=<<App Registration Client Id>>
-azure.key-vault.clientSecret=<<App Registration Client Secret>>
-azure.key-vault.endpoint=https://<<Key Vault Name>>.vault.azure.net/
-azure.key-vault.tenantId=<<Tenant Id>>
+azure.key-vault.clientId=  
+azure.key-vault.clientSecret=  
+azure.key-vault.endpoint=  
+azure.key-vault.tenantId=  
