@@ -11,7 +11,7 @@
 	<groupId>com.delta.standalone.lib</groupId>
 	<artifactId>delta.standalone</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>delta.standalone</name>
+	<name>delta.standalone.springboot</name>
 	<description>Delta Standalone Library</description>
 	<properties>
 		<java.version>11</java.version>
@@ -27,16 +27,9 @@
 			<scope>provided</scope>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
-<!--			<exclusions>-->
-<!--				<exclusion>-->
-<!--					<artifactId>log4j-over-slf4j</artifactId>-->
-<!--					<groupId>org.slf4j</groupId>-->
-<!--				</exclusion>-->
-<!--			</exclusions>-->
 		</dependency>
 
 		<dependency>
@@ -75,27 +68,6 @@
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-azure</artifactId>
 			<version>3.3.4</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop -->
-		<dependency>
-			<groupId>org.apache.parquet</groupId>
-			<artifactId>parquet-hadoop</artifactId>
-			<version>1.12.3</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.wildfly.openssl/wildfly-openssl -->
-		<dependency>
-			<groupId>org.wildfly.openssl</groupId>
-			<artifactId>wildfly-openssl</artifactId>
-			<version>2.2.5.Final</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop -->
-		<dependency>
-			<groupId>org.apache.parquet</groupId>
-			<artifactId>parquet-hadoop</artifactId>
-			<version>1.12.3</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.json/json -->
@@ -145,13 +117,6 @@
 			<groupId>com.azure</groupId>
 			<artifactId>azure-identity</artifactId>
 			<version>1.5.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.azure</groupId>
-			<artifactId>azure-identity</artifactId>
-			<version>1.5.4</version>
-			<scope>compile</scope>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.microsoft.azure/azure-keyvault -->
@@ -167,28 +132,9 @@
 			<artifactId>azure</artifactId>
 			<version>1.41.4</version>
 		</dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency>
-
-
 	</dependencies>
 
-	<exclusions>
-		<exclusion>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-		</exclusion>
-		<exclusion>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</exclusion>
-	</exclusions>
+
 
 
 	<build>
