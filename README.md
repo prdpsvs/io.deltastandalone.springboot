@@ -9,27 +9,28 @@ Delta lake format is becoming a new open-source standard for data analytics. But
 * Time Travel
 * Schema Evolution
 
-Primarly, deltalake format standardization is acheived with spark engine (big data enigneering and analytical workloads). Can we read the datasets stored in delta format outside Spark using standard libraries? Yes, we can however, we need to figure out a way how transaction log (a.k.a _delta_log) can be parsed.
+Primarly, deltalake format standardization is acheived with spark engine (big data enigneering and analytical workloads). Can we read the datasets stored in delta format outside Spark using standard libraries? Yes, delta lake internally uses parquet format to store data and transaction log to persist metadata of operations performed on a given dataset. So if we can figure out a way how transaction log (a.k.a _delta_log) works, then the actual data files stored in parquet format can be read using apache-parquet & parquet-tools libraries.
 
 ### What consists of Transaction Log?
 Whenever user modifies a dataset (insert/update/delete), delta lake breaks the operation into series of steps composed of one or more action. A few examples of an action are Add file, Remove file, Update metadata etc. All these actions are recorded as atomic steps called commits stored as a json file. Each action on a dataset is a commit, resulting in a json (000000.json) file. 10 commits become a checkpoint (0000010.checkpoint. parquet) file.  
-Is Transaction Log user friendly to understand?
+
+### Is Transaction Log user friendly to understand?
 Yes, understanding each commit json file is very straight forward. It contains the following metadata
-* commitInfo – commitInfo object has timestamp, type of operation, operation metrics, operation parameters, readversion and isBlindAppend
+* commitInfo – commitInfo object has timestamp, type of operation, operation metrics, operation parameters, readversion and isBlindAppend properties
 * Series of actions
-  -	If the action is add/remove, then it has path, partitionValues (if any), size, modification time, data change and stats.
-  -	Stats contains minimum and maximum values of all columns stored in a file.
+  -	If the action is add/remove, then it has path, partitionValues (if any), size, modification time, data change and stats. Stats contains minimum and maximum values of all columns stored in a file.
+  -	If the action is update metadata/change protocol, the commitinfo is updated with datachange set to false on all files on the latest commit.
 
 ### Are there ways to read and Interpret Transaction Log?
 Yes, there are couple of ways to read and interpret transaction log files under _delta_log folder.
 * As each commit or series of commits (checkpoint) are json files, its easy-to-read json contents. I would not prefer this approach for two reasons 
-  - This one is obvious, Rebuilding metadata by reading json content for each commit since last checkpoint can be cumbersome. Note the change in transaction log     metadata structure can lead to read failures (read change protocol action).
+  - This one is obvious, Rebuilding metadata by reading json content for each commit since last checkpoint can be cumbersome. Note the change in transaction log     metadata structure can lead to read failures (read about change protocol action).
   - Delta format adheres to optimistic concurrency. What happens if two or more users are reading the dataset while you are writing or vise verse?
-* Is there a better way to read delta format datasets? Yes, the delta standalone library is a solution. It is a single node java library that can be used to read from and write to delta datasets on file storage. This file storage can be ADLS Gen2, Windows/Linux file systems, S3 buckets or another file store that supports HDFS api’s.
+* Is there a better way to read delta format datasets? Yes, the delta standalone library can address the above issues adhering to change protocol and optimistic concurreny control. 
 
 ### What is Delta Standalone Library?
 
-Delta Standalone library provides APIs to interact with a dataset metadata in the transaction log, implementing the Delta Transaction Log Protocol to achieve the transactional guarantees of the Delta Lake format. The good part is that this library does not depend on Apache Spark and has only a few transitive dependencies, therefore it can be used by any compute (Web Api’s, Azure Functions, Web Jobs with combination of MPP systems such as SQL databases/data warehouses).
+Delta Standalone is a single node java library that can be used to read from and write to delta datasets on file storage. This file storage can be ADLS Gen2, Windows/Linux file systems, S3 buckets or another file store that supports HDFS api’s. It provides APIs to interact on a dataset metadata in the transaction log, implementing the Delta Transaction Log Protocol to achieve the transactional guarantees of the Delta Lake format. The good part is that this library does not depend on apache Spark and has only a few transitive dependencies, therefore it can be used by any compute (Web Api’s, Azure Functions, Web Jobs with combination of MPP systems such as SQL databases/data warehouses) layer.
 
 ### Where can I use this Library?
 If you observe this library closely, you will notice that the power of this library is not to read the actual data but the metadata (transaction log a.k.a _delta_log). Now let’s define use cases where we can use this library?
