@@ -2,15 +2,6 @@
 
 [![Java CI with Maven](https://github.com/prdpsvs/io.deltastandalone.springboot/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/prdpsvs/io.deltastandalone.springboot/actions/workflows/maven.yml)
 
-
-## Add following properties to application.properties file
-
-azure.key-vault.clientId=  
-azure.key-vault.clientSecret=  
-azure.key-vault.endpoint=  
-azure.key-vault.tenantId=  
-
-
 ## Delta Format Use cases outside Spark
 
 Delta lake format is becoming a new open-source standard for data analytics. But why?
@@ -31,10 +22,10 @@ Yes, understanding each commit json file is very straight forward. It contains t
 
 ### Are there ways to read and Interpret Transaction Log?
 Yes, there are couple of ways to read and interpret transaction log files under _delta_log folder.
-*	As each commit or series of commits (checkpoint) are json files, its easy-to-read json contents. I would not prefer this approach for two reasons 
+* As each commit or series of commits (checkpoint) are json files, its easy-to-read json contents. I would not prefer this approach for two reasons 
   - This one is obvious, Rebuilding metadata by reading json content for each commit since last checkpoint can be cumbersome. Note the change in transaction log     metadata structure can lead to read failures (read change protocol action).
   - Delta format adheres to optimistic concurrency. What happens if two or more users are reading the dataset while you are writing or vise verse?
-*	Is there a better way to read delta format datasets? Yes, the delta standalone library is a solution. It is a single node java library that can be used to read from and write to delta datasets on file storage. This file storage can be ADLS Gen2, Windows/Linux file systems, S3 buckets or another file store that supports HDFS api’s.
+* Is there a better way to read delta format datasets? Yes, the delta standalone library is a solution. It is a single node java library that can be used to read from and write to delta datasets on file storage. This file storage can be ADLS Gen2, Windows/Linux file systems, S3 buckets or another file store that supports HDFS api’s.
 
 ### What is Delta Standalone Library?
 
@@ -54,6 +45,72 @@ This library is simple to use. You need to know about three classes to successfu
 * OptimisticTransaction – This is a main class to set the updates to the transaction log. During a transaction all reads must be done using OptimisticTransaction instead of DeltaLog in order to detect conflicts and concurrent updates.
 
 Now that you know the most important classes to read delta log, let’s get right into an example:
+
+This delta standalone example is wrapped by a spring boot application with DatasetController class. DatasetController class has a request mapping (getDatasetfilesToRead) method to get the delta files paths to read based on inputs and configuration provided.
+
+* Request Mapping
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Controller/DatasetController.java#L22
+
+* DatasetConfig in above request mapping input is serialized as an object based on user input
+```
+{
+"DatasetStorageName": "pvenkattestsa", -- Name of storage account
+"DatasetContainerName": "primary", -- Name of container
+"StorageConnectionSecretName":"adbnycdatasetStorageCred", -- Name of KeyVault secret associated to read the data from storage and a container
+"DatasetFolderPath":"/Synapse/Streaming/NYTaxiRawadb_delta_partitioned", -- folder path where the dataset is available
+"DatasetVersion":"Latest", -- version of a dataset to read. Right now, only latest version is supported
+"DatasetRules": 
+  [ -- Rules that will help to filter data before returning files
+    {
+          "ColumnName": "doLocationId",
+          "DataType": "String",
+          "Value": "7",
+          "IsPartitioned": false, -- Is this column used in partitioning? If true, DeltaScan class will perform partition pruning. If false, DeltaScan will perform residual scanning on file. Residual scanning will prune file based on file stats available as an action in a commit (under _delta_log folder)
+          "ValueFormat": ""
+    }, {
+        "ColumnName": "rateCodeId",
+        "DataType": "Int",
+        "Value": 3,
+        "IsPartitioned": false, 
+        "ValueFormat": ""
+    }, {
+        "ColumnName": "puLocationId",
+        "DataType": "String",
+        "Value": "3",
+        "IsPartitioned": true,
+        "ValueFormat": ""
+    }, {
+        "ColumnName": "puMonth",
+        "DataType": "Int",
+        "Value": 11,
+        "IsPartitioned": false,
+        "ValueFormat": ""
+    }
+  ]
+}
+```
+To successfully read deltalog of a dataset
+
+* Set the storage configuration to the storage where delta datasets are stored. Refer to below method where storage configuration is set to use ADLS Gen2 storage account. The following method uses application registration to connect to storage account with storage blob data contributor role. The application registration secret is stored in KeyVault and KeyVault credentials are stored in application.properties file.
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/ConfigurationService.java#L20
+  - Client Id, Client Secret and Tenant Id values are stored as a secret in Key Vault. Store the secret in following format.
+    ```
+    {
+      "clientId": "",
+      "clientSecret": "",
+      "tenantId": ""
+    }
+    ```
+  - Key Vault credentials are stored in application.properties file within project structure. Add following properties to application.properties file. The below code will fetch the secret from KeyVault
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/KeyVaultClientProvider.java#L17
+    ```
+      azure.key-vault.clientId=  
+      azure.key-vault.clientSecret=  
+      azure.key-vault.endpoint=  
+      azure.key-vault.tenantId= 
+    ```
+* Use DeltaLog class to initialize 
+  
 
 
 
