@@ -2,7 +2,7 @@
 
 [![Java CI with Maven](https://github.com/prdpsvs/io.deltastandalone.springboot/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/prdpsvs/io.deltastandalone.springboot/actions/workflows/maven.yml)
 
-## Delta Format Use cases outside Spark
+## DeltaLake Format Use cases outside Spark
 
 Delta lake format is becoming a new open-source standard for data analytics. But why?
 * ACID Support
