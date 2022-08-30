@@ -44,52 +44,7 @@ This library is simple to use. You need to know about three classes to successfu
 * Snapshot & DeltaScan – snapshot represents the state of a dataset at a specific version. DeltaLog class also provides a way to read a version using getSnapshotForTimestampAsOf or getSnapshotForVersionAsOf. DeltaScan provides memory-optimized iterator over metadata files optionally by passing in a partition filtering predicate (partition pruning)
 * OptimisticTransaction – This is a main class to set the updates to the transaction log. During a transaction all reads must be done using OptimisticTransaction instead of DeltaLog in order to detect conflicts and concurrent updates.
 
-Now that you know the most important classes to read delta log, let’s get right into an example:
-
-This delta standalone example is wrapped by a spring boot application with DatasetController class. DatasetController class has a request mapping (getDatasetfilesToRead) method to get the delta files paths to read based on inputs and configuration provided.
-
-* Request Mapping
-https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Controller/DatasetController.java#L20-L28
-
-* DatasetConfig in above request mapping input is serialized as an object based on user input
-```
-{
-"DatasetStorageName": "pvenkattestsa", -- Name of storage account
-"DatasetContainerName": "primary", -- Name of container
-"StorageConnectionSecretName":"adbnycdatasetStorageCred", -- Name of KeyVault secret associated to read the data from storage and a container
-"DatasetFolderPath":"/Synapse/Streaming/NYTaxiRawadb_delta_partitioned", -- folder path where the dataset is available
-"DatasetVersion":"Latest", -- version of a dataset to read. Right now, only latest version is supported
-"DatasetRules": 
-  [ -- Rules that will help to filter data before returning files
-    {
-          "ColumnName": "doLocationId",
-          "DataType": "String",
-          "Value": "7",
-          "IsPartitioned": false, -- Is this column used in partitioning? If true, DeltaScan class will perform partition pruning. If false, DeltaScan will perform residual scanning on file. Residual scanning will prune file based on file stats available as an action in a commit (under _delta_log folder)
-          "ValueFormat": ""
-    }, {
-        "ColumnName": "rateCodeId",
-        "DataType": "Int",
-        "Value": 3,
-        "IsPartitioned": false, 
-        "ValueFormat": ""
-    }, {
-        "ColumnName": "puLocationId",
-        "DataType": "String",
-        "Value": "3",
-        "IsPartitioned": true,
-        "ValueFormat": ""
-    }, {
-        "ColumnName": "puMonth",
-        "DataType": "Int",
-        "Value": 11,
-        "IsPartitioned": false,
-        "ValueFormat": ""
-    }
-  ]
-}
-```
-To successfully read deltalog of a dataset
+### Pre-requsites to setup the solution
 
 * Set the storage configuration to the storage where delta datasets are stored. Refer to below method where storage configuration is set to use ADLS Gen2 storage account. The following method uses application registration to connect to storage account with storage blob data contributor role. The application registration secret is stored in KeyVault and KeyVault credentials are stored in application.properties file.
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/ConfigurationService.java#L20-L31
@@ -109,12 +64,24 @@ https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67d
       azure.key-vault.endpoint=  
       azure.key-vault.tenantId= 
     ```
-* Initialize DeltaLog class to read the dataset from storage configuration and user input. The below line uses transtive hadoop dependency 'org.apache.hadoop.conf.Configuration' to use underlying log store (in this case, Azure Log Store) api to connect to storage account.
+
+Now that you know the most important classes to read delta log and pre-requisites, let’s get right into an example:
+
+This delta standalone example is wrapped by a spring boot application with DatasetController class. DatasetController class has many request mappings. One of the request mappings is getDatasetfilesToRead method to get the delta files paths to read based on inputs and configuration provided.
+
+* Request Mapping - getDatasetfilesToRead
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Controller/DatasetController.java#L20-L28
+
+  * Initialize DeltaLog class to read the dataset from storage configuration and user input. The below line uses transtive hadoop dependency 'org.apache.hadoop.conf.Configuration' to use underlying log store (in this case, Azure Log Store) api to connect to storage account.
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L71
-* Get the latest snapshot, schema of dataset and apply partition pruning rules
+  * Get the latest snapshot, schema of dataset and apply partition pruning rules
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L73-L75
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L82-L87
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L144-L152
+  * Non partition columns data filtering (Residual Predicate) - TBD
+With above steps, you can request the list of files of a given version to read the dataset
+
+* Request Mapping - getDatasetRecords (TBD)
 
 
 
