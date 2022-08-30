@@ -49,7 +49,7 @@ Now that you know the most important classes to read delta log, let’s get righ
 This delta standalone example is wrapped by a spring boot application with DatasetController class. DatasetController class has a request mapping (getDatasetfilesToRead) method to get the delta files paths to read based on inputs and configuration provided.
 
 * Request Mapping
-https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Controller/DatasetController.java#L22
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Controller/DatasetController.java#L20-L28
 
 * DatasetConfig in above request mapping input is serialized as an object based on user input
 ```
@@ -92,7 +92,7 @@ https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67d
 To successfully read deltalog of a dataset
 
 * Set the storage configuration to the storage where delta datasets are stored. Refer to below method where storage configuration is set to use ADLS Gen2 storage account. The following method uses application registration to connect to storage account with storage blob data contributor role. The application registration secret is stored in KeyVault and KeyVault credentials are stored in application.properties file.
-https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/ConfigurationService.java#L20
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/ConfigurationService.java#L20-L31
   - Client Id, Client Secret and Tenant Id values are stored as a secret in Key Vault. Store the secret in following format.
     ```
     {
@@ -111,7 +111,11 @@ https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67d
     ```
 * Initialize DeltaLog class to read the dataset from storage configuration and user input. The below line uses transtive hadoop dependency 'org.apache.hadoop.conf.Configuration' to use underlying log store (in this case, Azure Log Store) api to connect to storage account.
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L71
-  
+* Get the latest snapshot, schema of dataset and apply partition pruning rules
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L73-L75
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L82-L87
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L144-L152
+
 
 
 
