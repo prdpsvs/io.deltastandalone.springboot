@@ -109,7 +109,8 @@ https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67d
       azure.key-vault.endpoint=  
       azure.key-vault.tenantId= 
     ```
-* Use DeltaLog class to initialize 
+* Initialize DeltaLog class to read the dataset from storage configuration and user input. The below line uses transtive hadoop dependency 'org.apache.hadoop.conf.Configuration' to use underlying log store (in this case, Azure Log Store) api to connect to storage account.
+https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L71
   
 
 
