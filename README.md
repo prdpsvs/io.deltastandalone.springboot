@@ -65,9 +65,9 @@ https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67d
       azure.key-vault.tenantId= 
     ```
 
-Now that you know the most important classes to read delta log and pre-requisites, let’s get right into an example:
+### How to use Delta Standalone?
 
-This delta standalone example is wrapped by a spring boot application with DatasetController class. DatasetController class has many request mappings. One of the request mappings is getDatasetfilesToRead method to get the delta files paths to read based on inputs and configuration provided.
+Now that you know the most important classes to read delta log and pre-requisites, let’s get right into an example. This delta standalone example is wrapped by a spring boot application with DatasetController class. DatasetController class has many request mappings. One of the request mappings is getDatasetfilesToRead method to get the delta files paths to read based on inputs and configuration provided.
 
 * Request Mapping - getDatasetfilesToRead
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Controller/DatasetController.java#L20-L28
@@ -78,8 +78,8 @@ https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67d
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L73-L75
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L82-L87
 https://github.com/prdpsvs/io.deltastandalone.springboot/blob/8fa502050b25bae67db51810c888f7fdbca45438/src/main/java/com/delta/standalone/lib/Service/DatasetService.java#L144-L152
-  * Non partition columns data filtering (Residual Predicate) - TBD
-With above steps, you can request the list of files of a given version to read the dataset
+  * Non partition columns data filtering (Residual Predicate) - TBD  
+Above steps will provide the list of files for a given version of a dataset.
 
 * Request Mapping - getDatasetRecords (TBD)
 
